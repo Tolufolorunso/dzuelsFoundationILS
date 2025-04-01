@@ -1,12 +1,13 @@
-import Colors from '@/data/Colors';
-import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import Colors from "@/data/Colors";
+import React from "react";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 
 type CustomInputProps = {
   label: string;
   placeholder: string;
   value?: string;
   password?: boolean;
+  isEditing?: boolean;
   onChangeText: (text: string) => void;
   onFocus?: () => void;
 };
@@ -18,6 +19,7 @@ export default function CustomInput({
   onChangeText,
   onFocus,
   password = false,
+  isEditing = false,
 }: CustomInputProps) {
   return (
     <View style={styles.container}>
@@ -32,6 +34,7 @@ export default function CustomInput({
         value={value}
         secureTextEntry={password}
         onFocus={onFocus}
+        editable={isEditing}
         // keyboardType="default"
         // autoCorrect={false}
       />
@@ -45,20 +48,20 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 4,
-    textTransform: 'capitalize',
-    color: '#4b5563',
+    textTransform: "capitalize",
+    color: "#4b5563",
     fontSize: 16,
   },
   required: {
     color: Colors.PRIMARY,
   },
   input: {
-    borderColor: '#d1d5db',
+    borderColor: "#d1d5db",
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 12,
     fontSize: 16,
-    color: '#111827',
+    color: "#111827",
   },
   inputFocused: {
     borderColor: Colors.PRIMARY, // focus:border-blue-500

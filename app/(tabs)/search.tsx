@@ -1,5 +1,5 @@
-import { Item } from "./../../components/search/item";
-import { Filter } from "./../../components/search/Filter";
+import { Item } from "@/components/search/item";
+import { Filter } from "@/components/search/Filter";
 import React, { useState, useMemo, useEffect } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { FlashList } from "@shopify/flash-list";
@@ -7,16 +7,16 @@ import { useRouter } from "expo-router";
 import styles from "@/styles/search.styles";
 
 export default function SearchScreen() {
-  const [surname, setSurname] = useState("");
-  const [barcode, setBarcode] = useState("");
-  const [type, setType] = useState("Any");
+  const [surname, setSurname] = useState<string>("");
+  const [barcode, setBarcode] = useState<string>("");
+  const [type, setType] = useState<"any" | "staff" | "student">("student");
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       setLoading(true);
       try {
         const response = await fetch(
@@ -44,14 +44,14 @@ export default function SearchScreen() {
         (surname === "" ||
           item?.surname.toLowerCase().includes(surname.toLowerCase())) &&
         (barcode === "" || item.barcode.includes(barcode)) &&
-        (type === "Any" || item.patronType.toLowerCase() === type.toLowerCase())
+        (type === "any" || item.patronType.toLowerCase() === type.toLowerCase())
     );
   }, [data, surname, barcode, type]);
 
   const clearFilters = () => {
     setSurname("");
     setBarcode("");
-    setType("Any");
+    setType("any");
   };
 
   const handlePatronDetail = (patronBarcode: string) => {

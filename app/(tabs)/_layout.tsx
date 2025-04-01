@@ -1,16 +1,14 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Colors from '@/data/Colors';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useAuthStore from '@/store/auth.store';
-import { Text } from 'react-native';
+import React from "react";
+import { Tabs } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import Colors from "@/data/Colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useAuthStore from "@/store/auth.store";
+import { Text } from "react-native";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore((state) => state);
-
-  console.log(user?.name);
 
   return (
     <Tabs
@@ -39,7 +37,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -48,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          title: "Search",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
@@ -57,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="circulation"
         options={{
-          title: 'Circulation',
+          title: "Circulation",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="book" size={size} color={color} />
           ),
@@ -66,7 +64,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="attendance"
         options={{
-          title: 'Attendance',
+          title: "Attendance",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="checkmark-circle" size={size} color={color} />
           ),
@@ -75,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-circle" size={size} color={color} />
           ),

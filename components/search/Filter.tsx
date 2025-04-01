@@ -9,8 +9,8 @@ interface FilterProps {
   setSurname: (text: string) => void;
   barcode: string;
   setBarcode: (text: string) => void;
-  type: string;
-  setType: (value: string) => void;
+  type: "any" | "staff" | "student";
+  setType: (value: "any" | "staff" | "student") => void;
   clearFilters: () => void;
 }
 
@@ -50,7 +50,7 @@ export function Filter({
           onValueChange={setType}
           style={styles.picker}
         >
-          <Picker.Item label="Any" value="Any" style={styles.pickerText} />
+          <Picker.Item label="Any" value="any" style={styles.pickerText} />
           <Picker.Item label="Staff" value="staff" style={styles.pickerText} />
           <Picker.Item
             label="Student"

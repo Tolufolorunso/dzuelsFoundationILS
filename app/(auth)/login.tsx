@@ -7,34 +7,34 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native';
-import React, { useState } from 'react';
-import Colors from '@/data/Colors';
-import CustomInput from '@/components/shared/CustomInput';
-import Button from '@/components/shared/Button';
-import useAuthStore from '@/store/auth.store';
-import { useRouter } from 'expo-router';
+} from "react-native";
+import React, { useState } from "react";
+import Colors from "@/data/Colors";
+import CustomInput from "@/components/shared/CustomInput";
+import Button from "@/components/shared/Button";
+import useAuthStore from "@/store/auth.store";
+import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>("tolufolorunso");
+  const [password, setPassword] = useState<string>("12345");
   const { login, isLoading, isCheckingAuth } = useAuthStore((state) => state);
 
   const router = useRouter();
 
   const handleLogin = async () => {
     if (!username || !password) {
-      return Alert.alert('Error', 'Please fill in all fields');
+      return Alert.alert("Error", "Please fill in all fields");
     }
 
     try {
       const data = await login(username, password);
       if (data.status) {
-        Alert.alert('Success', data.message);
-        router.replace('/(tabs)');
+        Alert.alert("Success", data.message);
+        router.replace("/(tabs)");
       }
     } catch (err: any) {
-      Alert.alert('Error', err.message);
+      Alert.alert("Error", err.message);
     }
   };
 
@@ -43,12 +43,12 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       <View style={styles.loginContainer}>
         <Image
-          source={require('../../assets/images/login-image.jpg')}
+          source={require("../../assets/images/login-image.jpg")}
           style={styles.loginImage}
         />
         <ScrollView style={styles.loginForm}>
@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loginImage: {
-    width: '100%',
+    width: "100%",
     height: 200,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   loginHeaderText: {
     fontSize: 24,
