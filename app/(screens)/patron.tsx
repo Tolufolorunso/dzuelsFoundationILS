@@ -1,17 +1,18 @@
-import { ProfileImage } from "./../../components/search/ProfileImage";
-import { PatronCustomInput } from "./../../components/search/PatronCustomInput";
-import React, { useState, useEffect } from "react";
-import styles from "@/styles/patron.styles";
-import { View, Text, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { ProfileImage } from './../../components/search/ProfileImage';
+import { PatronCustomInput } from './../../components/search/PatronCustomInput';
+import React, { useState, useEffect } from 'react';
+import styles from '@/styles/patron.styles';
+import { View, Text, ScrollView, Alert, ActivityIndicator } from 'react-native';
 
-import { useLocalSearchParams } from "expo-router";
-import usePatronStore from "@/store/patron.store";
-import Button from "@/components/shared/Button";
-import Colors from "@/data/Colors";
-import { patronLabelArr } from "@/data/patronLabelArr";
+import { useLocalSearchParams } from 'expo-router';
+import usePatronStore from '@/store/patron.store';
+import Button from '@/components/shared/Button';
+import Colors from '@/data/Colors';
+import { patronLabelArr } from '@/data/patronLabelArr';
+import useAuthStore from '@/store/auth.store';
 
 export default function PatronProfileScreen() {
-  const [formData, setFormData] = useState<any>({});
+  let [formData, setFormData] = useState<any>({});
   const [originalData, setOriginalData] = useState<any>({});
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -19,6 +20,7 @@ export default function PatronProfileScreen() {
   const [isEditing, setIsEditing] = useState(false);
 
   const { editPatron, fetchPatron } = usePatronStore((state) => state);
+  const { token } = useAuthStore((state) => state);
 
   const { barcode } = useLocalSearchParams();
 
@@ -31,7 +33,7 @@ export default function PatronProfileScreen() {
           `https://dzuelsfoundation.vercel.app/api/patrons/short-profile/${barcode}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error('Failed to fetch data');
         }
         const { patron } = await response.json();
         setFormData(patron);
@@ -40,8 +42,8 @@ export default function PatronProfileScreen() {
           setImageUrl(patron.imgUrl);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        Alert.alert("Error", "Failed to load patron data");
+        console.error('Error fetching data:', error);
+        Alert.alert('Error', 'Failed to load patron data');
       } finally {
         setLoading(false);
       }
@@ -61,14 +63,17 @@ export default function PatronProfileScreen() {
 
   // Save changes to patron data
   const handleSubmit = async () => {
-    console.log(formData);
     try {
-      const res = await editPatron(formData);
-      Alert.alert("Success", "Profile updated successfully");
+      delete formData.imgUrl;
+      const res = await editPatron(formData, token);
+      if (!res.status) {
+        throw new Error(res.errorMessage);
+      }
+      Alert.alert('Success', 'Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating data:", error);
-      Alert.alert("Error", "Failed to update profile");
+      console.error('Error updating data:', error);
+      Alert.alert('Error', 'Failed to update profile');
     }
   };
 
@@ -114,7 +119,7 @@ export default function PatronProfileScreen() {
           field={key}
           label={label}
           isEditing={isEditing}
-          value={formData[key] || ""}
+          value={formData[key] || ''}
           handleChange={handleChange}
         />
       ))}

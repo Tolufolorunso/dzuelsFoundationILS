@@ -1,5 +1,5 @@
-import React from "react";
-import styles from "@/styles/patron.styles";
+import React from 'react';
+import styles from '@/styles/patron.styles';
 import {
   Text,
   TextInput,
@@ -7,7 +7,7 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
-} from "react-native";
+} from 'react-native';
 
 interface PatronCustomInputProps {
   field: string;
@@ -32,10 +32,15 @@ export function PatronCustomInput({
     <View style={[styles.section, containerStyle]}>
       <Text style={styles.label}>{label}:</Text>
       <TextInput
-        style={[styles.input, !isEditing && styles.disabledInput, inputStyle]}
+        style={[
+          styles.input,
+          !isEditing && styles.disabledInput,
+          field === 'library' && styles.disabledInput,
+          inputStyle,
+        ]}
         value={value}
         onChangeText={(text) => handleChange(field, text)}
-        editable={isEditing}
+        editable={field === 'library' ? false : isEditing}
       />
     </View>
   );

@@ -1,23 +1,42 @@
 import { create } from 'zustand';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+interface ApiResponse<T = unknown> {
+  status: boolean;
+  data?: T;
+  errorMessage?: string;
+}
+
+interface PatronFormData {
+  token: string;
+  [key: string]: any;
+}
+
+interface PatronData {
+  [key: string]: any;
+}
 
 interface PatronState {
-  editPatron: (formData: any) => Promise<{ status: boolean; data: any }>;
+  isLoading: boolean;
+  editPatron: (
+    formData: PatronFormData,
+    token: string | null
+  ) => Promise<ApiResponse<PatronData>>;
   fetchPatron: (data: any) => Promise<{ status: boolean; data: any }>;
 }
 
 const usePatronStore = create<PatronState>((set) => ({
   isLoading: false,
 
-  editPatron: async (formData) => {
+  editPatron: async (formData, token) => {
     try {
       // Send the updated data to the server
       const response = await fetch(
-        `https://dzuelsfoundation.vercel.app/api/patrons/update-profile/${formData.barcode}`,
+        'https://dzuelsfoundation.vercel.app/api/patrons/edit/',
         {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
         }
@@ -27,12 +46,21 @@ const usePatronStore = create<PatronState>((set) => ({
         throw new Error('Failed to update data');
       }
 
-      const data = await response.json();
+      const data: PatronData = await response.json();
+      console.log('Response data:', data);
 
       return { status: true, data };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating data:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred';
+      return { status: false, errorMessage };
     }
+  },
+
+  fetchPatron: async (data: any) => {
+    // Implement your fetchPatron logic here
+    return { status: false, data: null };
   },
 }));
 

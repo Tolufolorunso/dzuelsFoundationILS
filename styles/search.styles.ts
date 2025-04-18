@@ -1,17 +1,17 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 const searchStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: '#f8f9fa',
   },
   filters: {
     marginBottom: 10,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 10,
     borderRadius: 8,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -19,17 +19,17 @@ const searchStyles = StyleSheet.create({
   },
   heading: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#d9534f",
+    fontWeight: 'bold',
+    color: '#d9534f',
     marginBottom: 10,
   },
   input: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor: '#f1f1f1',
     padding: 7,
     borderRadius: 6,
     marginBottom: 7,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: '#ddd',
   },
   picker: {
     marginBottom: 7,
@@ -40,17 +40,17 @@ const searchStyles = StyleSheet.create({
     padding: 0,
   },
   row: {
-    flexDirection: "row",
-    gap: 5,
+    flexDirection: 'row',
+    gap: 3,
     padding: 12,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: '#ddd',
   },
   cell: {
     flex: 1,
     fontSize: 11,
-    color: "#333",
+    color: '#333',
   },
 });
 

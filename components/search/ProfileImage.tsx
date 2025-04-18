@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import styles from "@/styles/patron.styles";
-import * as ImagePicker from "expo-image-picker";
-import { Alert, Platform, Text, TouchableOpacity } from "react-native";
-import { Image } from "expo-image";
+import React, { useState } from 'react';
+import styles from '@/styles/patron.styles';
+import * as ImagePicker from 'expo-image-picker';
+import { Alert, Platform, Text, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 
 interface ProfileImageProps {
   imageUrl: string | null;
@@ -11,7 +11,7 @@ interface ProfileImageProps {
 }
 
 const blurhash =
-  "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 export function ProfileImage({
   imageUrl,
@@ -27,9 +27,9 @@ export function ProfileImage({
       const response = await fetch(
         `https://dzuelsfoundation.vercel.app/api/patrons/upload/`,
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             photoData: imageBase64,
@@ -40,16 +40,16 @@ export function ProfileImage({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.errorMessage || "Failed to upload image");
+        throw new Error(errorData.errorMessage || 'Failed to upload image');
       }
 
       const data = await response.json();
       return data.imageUrl;
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error('Error uploading image:', error);
       Alert.alert(
-        "Error",
-        error instanceof Error ? error.message : "Failed to upload image"
+        'Error',
+        error instanceof Error ? error.message : 'Failed to upload image'
       );
       throw error;
     } finally {
@@ -61,23 +61,23 @@ export function ProfileImage({
     if (isUploading) return;
 
     try {
-      if (Platform.OS !== "web") {
+      if (Platform.OS !== 'web') {
         const { status } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
+        if (status !== 'granted') {
           Alert.alert(
-            "Permission denied",
-            "We need permissions to access your photos"
+            'Permission denied',
+            'We need permissions to access your photos'
           );
           return;
         }
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: "images",
+        mediaTypes: 'images',
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.7,
+        aspect: [5, 7],
+        quality: 0.5,
         base64: true,
       });
 
@@ -97,19 +97,19 @@ export function ProfileImage({
             // Update with the secure URL from Cloudinary
             if (newImageUrl) {
               setImageUrl(newImageUrl);
-              Alert.alert("Success", "Profile image updated successfully");
+              Alert.alert('Success', 'Profile image updated successfully');
             }
           } catch (error) {
             console.log(error);
             setImageUrl(imageUrl);
           }
         } else {
-          Alert.alert("Error", "Could not get image data");
+          Alert.alert('Error', 'Could not get image data');
         }
       }
     } catch (error) {
-      console.error("Error selecting image:", error);
-      Alert.alert("Error", "Failed to select image");
+      console.error('Error selecting image:', error);
+      Alert.alert('Error', 'Failed to select image');
     }
   };
 
@@ -119,7 +119,7 @@ export function ProfileImage({
         source={
           imageUrl
             ? { uri: imageUrl }
-            : require("../../assets/images/login-image.jpg")
+            : require('../../assets/images/login-image.jpg')
         }
         style={styles.image}
         placeholder={{ blurhash }}
@@ -127,7 +127,7 @@ export function ProfileImage({
         transition={1000}
       />
       <Text style={styles.changeImageText}>
-        {isUploading ? "Uploading..." : "Change Photo"}
+        {isUploading ? 'Uploading...' : 'Change Photo'}
       </Text>
     </TouchableOpacity>
   );

@@ -1,6 +1,6 @@
-import { View, Text } from "react-native";
-import React from "react";
-import styles from "@/styles/home.styles";
+import { View, Text } from 'react-native';
+import React from 'react';
+import styles from '@/styles/home.styles';
 
 export default ({
   label,
@@ -15,8 +15,9 @@ export default ({
     style={[
       styles.statBox,
       {
-        flexDirection: row ? "row" : "column",
-        justifyContent: row ? "space-between" : "center",
+        flexDirection: row ? 'row' : 'column',
+        justifyContent: row ? 'space-between' : 'center',
+        borderRadius: row ? 0 : 8,
       },
     ]}
   >

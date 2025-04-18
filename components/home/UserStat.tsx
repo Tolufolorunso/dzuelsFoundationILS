@@ -1,6 +1,6 @@
-import styles from "@/styles/home.styles";
-import { View } from "react-native";
-import StatItem from "./StatItem";
+import styles from '@/styles/home.styles';
+import { View } from 'react-native';
+import StatItem from './StatItem';
 
 interface UserStatProps {
   numOfFemale: number;
@@ -18,7 +18,7 @@ export function UserStat({
   numOfTeacher,
 }: UserStatProps) {
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, { borderRadius: 8 }]}>
       <StatItem row label="Students" value={numOfFemale + numOfMale} />
       <StatItem row label="Staff" value={numOfStaff} />
       <StatItem row label="Guests" value={numOfguest} />
