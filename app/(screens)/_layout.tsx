@@ -1,6 +1,6 @@
-import { Text, View } from 'react-native';
-import React, { Component } from 'react';
-import { Stack } from 'expo-router';
+import { Text, View } from "react-native";
+import React, { Component } from "react";
+import { Stack } from "expo-router";
 
 export default class _layout extends Component {
   render() {
@@ -9,37 +9,44 @@ export default class _layout extends Component {
         <Stack.Screen
           name="checkin"
           options={{
-            title: 'Checkin',
+            title: "Checkin",
           }}
         />
         <Stack.Screen
           name="checkout"
           options={{
-            title: 'Checkout',
+            title: "Checkout",
           }}
         />
         <Stack.Screen
           name="holds"
           options={{
-            title: 'Book Outside',
+            title: "Book Outside",
           }}
         />
         <Stack.Screen
           name="overdues"
           options={{
-            title: 'Books Not Returned',
+            title: "Books Not Returned",
           }}
         />
         <Stack.Screen
           name="renew"
           options={{
-            title: 'Renew Book',
+            title: "Renew Book",
           }}
         />
         <Stack.Screen
           name="patron"
           options={{
-            title: 'Patron Profile',
+            title: "Patron Profile",
+          }}
+        />
+        <Stack.Screen
+          name="camera"
+          options={{
+            title: "Patron Profile",
+            headerShown: false,
           }}
         />
       </Stack>

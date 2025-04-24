@@ -48,7 +48,8 @@
     "@shopify/flash-list": "1.7.3",
     "expo-image": "~2.0.7",
     "expo-image-picker": "~16.0.6",
-    "@react-native-community/datetimepicker": "8.2.0"
+    "@react-native-community/datetimepicker": "8.2.0",
+    "expo-image-manipulator": "~13.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

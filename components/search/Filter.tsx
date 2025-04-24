@@ -14,7 +14,7 @@ interface FilterProps {
   clearFilters: () => void;
 }
 
-export function Filter({
+export const Filter: React.FC<FilterProps> = ({
   surname,
   setSurname,
   barcode,
@@ -22,7 +22,7 @@ export function Filter({
   type,
   setType,
   clearFilters,
-}: FilterProps) {
+}) => {
   return (
     <View style={styles.filters}>
       <Text style={styles.heading}>Search</Text>
@@ -62,4 +62,4 @@ export function Filter({
       <Button text="CLEAR SEARCH" onPress={clearFilters} size="small" />
     </View>
   );
-}
+};
