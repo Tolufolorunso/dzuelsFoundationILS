@@ -1,56 +1,38 @@
-import { ProfileImage } from "./../../components/search/ProfileImage";
-import { PatronCustomInput } from "./../../components/search/PatronCustomInput";
-import React, { useState, useEffect } from "react";
-import styles from "@/styles/patron.styles";
-import { View, Text, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { ProfileImage } from '@/components/search/ProfileImage';
+import { PatronCustomInput } from '@/components/search/PatronCustomInput';
+import React, { useState, useEffect } from 'react';
+import styles from '@/styles/patron.styles';
+import { View, Text, ScrollView, Alert } from 'react-native';
 
-import { useLocalSearchParams } from "expo-router";
-import usePatronStore from "@/store/patron.store";
-import Button from "@/components/shared/Button";
-import Colors from "@/data/Colors";
-import { patronLabelArr } from "@/data/patronLabelArr";
-import useAuthStore from "@/store/auth.store";
+import { useLocalSearchParams } from 'expo-router';
+import usePatronStore from '@/store/patron.store';
+import Button from '@/components/shared/Button';
+import { patronLabelArr } from '@/data/patronLabelArr';
+import useAuthStore from '@/store/auth.store';
+import FullLoadingActivityIndicator from '@/components/shared/FullLoadingActivityIndicator';
 
 export default function PatronProfileScreen() {
   let [formData, setFormData] = useState<any>({});
   const [originalData, setOriginalData] = useState<any>({});
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { editPatron, fetchPatron } = usePatronStore((state) => state);
+  const { editPatron, isLoading, fetchPatron, imgUrl } = usePatronStore(
+    (state) => state
+  );
   const { token } = useAuthStore((state) => state);
-
   const { barcode } = useLocalSearchParams();
-
-  console.log("barcode", barcode);
 
   // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
-        const response = await fetch(
-          `https://dzuelsfoundation.vercel.app/api/patrons/short-profile/${barcode}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const { patron } = await response.json();
-        setFormData(patron);
-        setOriginalData(patron); // Save original data for canceling edits
-        if (patron.imgUrl) {
-          setImageUrl(patron.imgUrl);
-        }
+        const { data } = await fetchPatron(barcode);
+        setFormData(data?.patron);
+        setOriginalData(data?.patron);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        Alert.alert("Error", "Failed to load patron data");
-      } finally {
-        setLoading(false);
+        Alert.alert('Error', 'Failed to load patron data');
       }
-
-      console.log("hello");
     };
 
     if (barcode) {
@@ -60,6 +42,7 @@ export default function PatronProfileScreen() {
 
   // Handle text input changes
   const handleChange = (field: string, value: string) => {
+    console.log(field, value);
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
@@ -71,13 +54,12 @@ export default function PatronProfileScreen() {
       delete formData.imgUrl;
       const res = await editPatron(formData, token);
       if (!res.status) {
-        throw new Error(res.errorMessage);
+        throw new Error(res.message);
       }
-      Alert.alert("Success", "Profile updated successfully");
+      Alert.alert('Success', 'Profile updated successfully');
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating data:", error);
-      Alert.alert("Error", "Failed to update profile");
+      Alert.alert('Error', 'Failed to update profile');
     }
   };
 
@@ -85,29 +67,22 @@ export default function PatronProfileScreen() {
   const toggleEdit = () => {
     if (isEditing) {
       setFormData(originalData);
-      setImageUrl(originalData.imgUrl);
     }
     setIsEditing((prev) => !prev);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.PRIMARY} />
+      <FullLoadingActivityIndicator>
         <Text style={styles.loadingText}>Loading profile...</Text>
-      </View>
+      </FullLoadingActivityIndicator>
     );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Image Section */}
-      <ProfileImage
-        barcode={barcode}
-        setImageUrl={setImageUrl}
-        imageUrl={imageUrl}
-      />
-      <Text>hellou</Text>
+      <ProfileImage barcode={barcode} imageUrl={imgUrl} />
       {/* Title */}
       <Text style={styles.title}>
         {formData.firstname} {formData.surname}
@@ -123,7 +98,7 @@ export default function PatronProfileScreen() {
           field={key}
           label={label}
           isEditing={isEditing}
-          value={formData[key] || ""}
+          value={formData[key] || ''}
           handleChange={handleChange}
         />
       ))}

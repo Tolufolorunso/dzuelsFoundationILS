@@ -1,93 +1,65 @@
-import React from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-import Colors from "@/data/Colors";
-import { useHolds } from "@/hooks/useHolds";
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 
-export default function HoldScreen() {
-  const { holds, loading } = useHolds();
+import FullLoadingActivityIndicator from '@/components/shared/FullLoadingActivityIndicator';
+import useCirculationStore from '@/store/circulation.store';
+import styles from '@/styles/circulation.styles';
+import Header from '@/components/header/Header';
+import Colors from '@/data/Colors';
+import AppText from '@/components/appText/AppText';
+import { HoldItemType } from './overdues';
+import ModalOverdue from '@/components/circulation/ModalOverdue';
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color={Colors.PRIMARY} />
-      </View>
-    );
+const HoldScreen: React.FC = () => {
+  const [selectedStudent, setSelectedStudent] = useState<HoldItemType | null>(
+    null
+  );
+  const { holds, fetchHolds, isLoading } = useCirculationStore(
+    (state) => state
+  );
+
+  useEffect(() => {
+    if (holds.length > 0) return;
+    fetchHolds();
+  }, []);
+
+  if (isLoading) {
+    return <FullLoadingActivityIndicator />;
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Patrons with Overdue Books</Text>
-      <Text style={[styles.header, { textAlign: "center" }]}>
-        Total: {holds.length}
-      </Text>
+    <View style={styles.holdsContainer}>
+      <View style={{ alignItems: 'center', paddingBottom: 20 }}>
+        <Header
+          style={{ color: Colors.PRIMARY, fontFamily: 'singleDay' }}
+          title="Patrons with Overdue Books"
+        />
+        <Header type={3} title={`Total: ${holds.length}`} />
+      </View>
       <FlatList
         data={holds}
         keyExtractor={(item: any) => item.patronBarcode + item.itemBarcode}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.patronName}>{item.patronName}</Text>
-            <Text style={styles.bookTitle}>
-              {item.title} {item.subtitle && `- ${item.subtitle}`}
-            </Text>
-          </View>
+          <TouchableOpacity
+            style={styles.holdsCard}
+            onPress={() => setSelectedStudent(item)}
+          >
+            <Header title={item.patronName} type={3} />
+            <AppText
+              title={`${item.title} ${item.subtitle && `- ${item.subtitle}`}`}
+              type={3}
+            />
+          </TouchableOpacity>
         )}
       />
+      {selectedStudent && (
+        <ModalOverdue
+          selectedStudent={selectedStudent}
+          setSelectedStudent={setSelectedStudent}
+        />
+      )}
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: Colors.WHITE,
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Colors.PRIMARY,
-    marginBottom: 15,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  noDataText: {
-    fontSize: 16,
-    textAlign: "center",
-    color: Colors.GRAY,
-  },
-  card: {
-    backgroundColor: "#f9f9f9",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  patronName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: Colors.PRIMARY,
-  },
-  bookTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginVertical: 5,
-  },
-  details: {
-    fontSize: 14,
-    color: Colors.GRAY,
-  },
-});
+export default HoldScreen;

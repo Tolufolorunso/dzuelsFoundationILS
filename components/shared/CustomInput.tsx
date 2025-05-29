@@ -21,7 +21,6 @@ export default function CustomInput({
   password = false,
   isEditing = true,
 }: CustomInputProps) {
-  console.log(isEditing);
   return (
     <View style={styles.container}>
       <Text style={styles.label}>

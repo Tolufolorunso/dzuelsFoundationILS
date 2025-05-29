@@ -2,53 +2,49 @@ import useAuthStore from '@/store/auth.store';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { ActivityIndicator, View } from 'react-native';
+import FullLoadingActivityIndicator from '@/components/shared/FullLoadingActivityIndicator';
+
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
-  const { user, token, checkAuth } = useAuthStore((state) => state);
-  const router = useRouter();
-  const segments = useSegments();
+  const [loaded, error] = useFonts({
+    'roboto-700': require('@/assets/fonts/Roboto-Bold.ttf'),
+    'roboto-500': require('@/assets/fonts/Roboto-Medium.ttf'),
+    'roboto-400': require('@/assets/fonts/Roboto-SemiBold.ttf'),
+    poppins: require('@/assets/fonts/Poppins-Regular.ttf'),
+    singleDay: require('@/assets/fonts/SingleDay-Regular.ttf'),
+  });
+
+  const { user, token, isCheckingAuth, checkAuth } = useAuthStore(
+    (state) => state
+  );
 
   useEffect(() => {
     checkAuth();
   }, []);
 
   useEffect(() => {
-    const isSignedIn = user && token;
-    const inLandingScreen = segments[0] === 'landing';
-    const inAuthScreen = segments[0] === '(auth)';
-
-    if (!isSignedIn && !inLandingScreen && !inAuthScreen) {
-      router.replace('/(auth)/login');
+    if (loaded || error) {
+      SplashScreen.hideAsync();
     }
+  }, [loaded, error]);
 
-    if (isSignedIn && inAuthScreen) {
-      router.replace('/(tabs)');
-    }
+  useEffect(() => {
+    if (!loaded) return; // Fonts must load first
+  }, [loaded]);
 
-    if (isSignedIn && inLandingScreen) {
-      router.replace('/(tabs)');
-    }
-  }, [user, token, segments]);
+  if (isCheckingAuth && !loaded && !error) {
+    return <FullLoadingActivityIndicator />;
+  }
 
   return (
     <Stack
       screenOptions={{
         headerShown: false,
       }}
-    >
-      <Stack.Screen
-        name="landing"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="(auth)/login"
-        options={{
-          title: 'Login',
-          headerTransparent: true,
-          headerTitle: '',
-        }}
-      />
-    </Stack>
+    />
   );
 }

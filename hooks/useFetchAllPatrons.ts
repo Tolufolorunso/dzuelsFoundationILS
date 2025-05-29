@@ -1,21 +1,27 @@
+import customFetch from '@/utils/customFetch';
 import { useEffect, useState } from 'react';
 
 // types/patron.ts
-export interface Patron {
+
+type image_url = {
+  public_id: string;
+  secure_url: string;
+};
+export type Patron = {
   _id: string;
   fullName: string;
-  imgUrl?: string;
+  image_url?: image_url;
   barcode: string;
   surname: string;
   patronType: string;
   points: number;
-}
+};
 
-interface ApiResponse {
+type ApiResponse = {
   status: boolean;
   data: Patron[];
-  errorMessage?: string;
-}
+  message?: string;
+};
 
 export const useFetchAllPatrons = () => {
   const [data, setData] = useState<Patron[]>([]);
@@ -28,19 +34,15 @@ export const useFetchAllPatrons = () => {
       setError(null);
 
       try {
-        const response = await fetch(
-          'https://dzuelsfoundation.vercel.app/api/patrons'
-        );
-        const result: ApiResponse = await response.json();
+        const response = await customFetch.get('/patrons');
 
+        const result = response.data as ApiResponse;
         if (result.status) {
           setData(result.data);
         } else {
-          console.error('Failed to fetch patrons:', result.errorMessage);
-          setError(result.errorMessage ?? 'Unknown error occurred');
+          setError(result.message ?? 'Unknown error occurred');
         }
       } catch (err: any) {
-        console.error('Error fetching data:', err);
         setError(err.message || 'Something went wrong');
       } finally {
         setLoading(false);

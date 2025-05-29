@@ -1,37 +1,41 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import React from 'react';
 import Colors from '@/data/Colors';
 import Button from '@/components/shared/Button';
 import { useRouter } from 'expo-router';
+import Header from '@/components/header/Header';
+import AppText from '@/components/appText/AppText';
+import { RedirectIfAuthenticated } from '@/components/auth/RedirectIfAuthenticated';
 
-export default function LandingScreen() {
+const LandingScreen: React.FC = () => {
   const router = useRouter();
   return (
-    <View>
+    <RedirectIfAuthenticated>
       <Image
         source={require('../assets/images/library-photo.jpg')}
         style={styles.image}
       />
       <View style={{ padding: 20 }}>
-        <Text style={styles.welcomeText}>
-          Welcome to Dzuels Library Management
-        </Text>
-        <Text style={[styles.welcomeTextSub, { marginVertical: 40 }]}>
-          Efficiently catalog books, track borrowing, and manage library
-          resources
-        </Text>
-        <Text style={styles.welcomeTextSub}>Staff login</Text>
-        <Button
-          text="Get Started"
-          onPress={() => router.push('/(auth)/login')}
+        <Header title="Dzuels Library Management" type={2} />
+        <AppText
+          title="Efficiently catalog books, track borrowing, and manage library
+          resources."
+          type={2}
+          style={styles.welcomeTextSub}
         />
-        <Text style={styles.haveAnAccount}>
-          Already have an account? Sign In Here
-        </Text>
+        <Header title="Staff Login" type={2} style={styles.welcomeTextSub} />
+        <Button text="Get Started" onPress={() => router.push('/login')} />
+        <AppText
+          type={2}
+          style={styles.haveAnAccount}
+          title="Already have an account? Sign In Here"
+        />
       </View>
-    </View>
+    </RedirectIfAuthenticated>
   );
-}
+};
+
+export default LandingScreen;
 
 const styles = StyleSheet.create({
   image: {
@@ -45,11 +49,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   welcomeTextSub: {
-    fontSize: 17,
-    fontWeight: 600,
     textAlign: 'center',
     color: Colors.GRAY,
     marginTop: 10,
+    marginVertical: 40,
   },
 
   btn: {
@@ -64,7 +67,6 @@ const styles = StyleSheet.create({
     color: Colors.WHITE,
   },
   haveAnAccount: {
-    fontSize: 16,
     textAlign: 'center',
     marginTop: 7,
     color: Colors.GRAY,

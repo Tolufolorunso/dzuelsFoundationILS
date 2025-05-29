@@ -1,7 +1,7 @@
 import { Item } from '@/components/search/item';
 import { Filter } from '@/components/search/Filter';
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
 import styles from '@/styles/search.styles';
@@ -15,29 +15,6 @@ export default function SearchScreen() {
 
   const router = useRouter();
   const { data: patrons, loading, error } = useFetchAllPatrons();
-
-  // useEffect(() => {
-  //   const fetchData = async (): Promise<void> => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await fetch(
-  //         'https://dzuelsfoundation.vercel.app/api/patrons'
-  //       );
-  //       const result = await response.json();
-  //       if (result.status) {
-  //         setData(result.data);
-  //       } else {
-  //         console.error('Failed to fetch patrons:', result.errorMessage);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   const filteredData = useMemo(() => {
     return patrons.filter(

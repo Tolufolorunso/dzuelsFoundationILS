@@ -1,41 +1,61 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import customFetch from '@/utils/customFetch';
 
-interface CirculationState {
-  loading: boolean;
+type HoldType = {
+  borrowingDate: string;
+  dueDate: string;
+  itemBarcode: string;
+  patronBarcode: string;
+  patronName: string;
+  subtitle: '';
+  title: string;
+};
+
+type CirculationState = {
+  isLoading: boolean;
+  holds: HoldType[];
+  setHolds: (holds: HoldType[]) => void;
   checkIn: (
     patronBarcode: string,
     itemBarcode: string,
     point: number
   ) => Promise<{ status: boolean; message: string }>;
-}
+  fetchHolds: () => Promise<void>;
+};
 
 const useCirculationStore = create<CirculationState>((set) => ({
-  loading: false,
+  isLoading: false,
+  holds: [],
+  setHolds: (holds) => set({ holds }),
   checkIn: async (patronBarcode, itemBarcode, point) => {
-    set({ loading: true });
+    set({ isLoading: true });
     try {
-      const response = await fetch(
-        'http://localhost:3000/api/circulation/checkin',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ patronBarcode, itemBarcode, point }),
-        }
-      );
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.errorMessage || 'Login failed');
-      }
-
-      set({ loading: false });
-      return { status: true, message: data.message };
+      const res = await customFetch.post('/circulation/checkin', {
+        patronBarcode,
+        itemBarcode,
+        point,
+      });
+      console.log(39, res);
+      set({ isLoading: false });
+      return { status: true, message: 'Item checked in successfully' };
     } catch (error: any) {
-      set({ loading: false });
-      throw new Error(error.message || 'Login failed');
+      console.log(error);
+      set({ isLoading: false });
+      return { status: false, message: error.message };
+    }
+  },
+
+  fetchHolds: async () => {
+    set({ isLoading: true });
+    try {
+      const res = await customFetch.get<{ holds: HoldType[] }>(
+        '/circaulation/holds'
+      );
+      const { holds } = res.data;
+      set({ isLoading: false, holds });
+    } catch (error) {
+      console.error('Error fetching holds:', error);
     }
   },
 }));

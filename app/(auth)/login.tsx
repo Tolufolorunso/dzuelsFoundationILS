@@ -14,11 +14,12 @@ import CustomInput from '@/components/shared/CustomInput';
 import Button from '@/components/shared/Button';
 import useAuthStore from '@/store/auth.store';
 import { useRouter } from 'expo-router';
+import Header from '@/components/header/Header';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState<string>('tolufolorunso');
   const [password, setPassword] = useState<string>('12345');
-  const { login, isLoading, isCheckingAuth } = useAuthStore((state) => state);
+  const { login, isLoading } = useAuthStore((state) => state);
 
   const router = useRouter();
 
@@ -26,19 +27,12 @@ export default function LoginScreen() {
     if (!username || !password) {
       return Alert.alert('Error', 'Please fill in all fields');
     }
-
     try {
-      const data = await login(username, password);
-      if (data.status) {
-        Alert.alert('Success', data.message);
-        router.replace('/(tabs)');
-      }
+      await login(username, password);
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
   };
-
-  if (isCheckingAuth) return null;
 
   return (
     <KeyboardAvoidingView
@@ -52,7 +46,11 @@ export default function LoginScreen() {
           style={styles.loginImage}
         />
         <ScrollView style={styles.loginForm}>
-          <Text style={styles.loginHeaderText}>Staff Login</Text>
+          <Header
+            title="Staff Login"
+            type={1}
+            style={{ fontFamily: 'singleDay' }}
+          />
           <Text
             style={[styles.loginHeaderText, { fontSize: 14, fontWeight: 500 }]}
           >

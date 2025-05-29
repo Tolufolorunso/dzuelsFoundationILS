@@ -1,15 +1,37 @@
-import { LastRegisteredMember } from "./../../components/home/LastRegisteredMember";
-import { UserStat } from "./../../components/home/UserStat";
-import { SmsSection } from "./../../components/home/SmsSection";
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { View, Text, FlatList } from "react-native";
-import useAuthStore from "@/store/auth.store";
-import styles from "@/styles/home.styles";
-import StatItem from "@/components/home/StatItem";
+import { LastRegisteredMember } from '../../components/home/LastRegisteredMember';
+import { UserStat } from '../../components/home/UserStat';
+import { SmsSection } from '../../components/home/SmsSection';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { View, Text, FlatList } from 'react-native';
+import useAuthStore from '@/store/auth.store';
+import styles from '@/styles/home.styles';
+import StatItem from '@/components/home/StatItem';
+import customFetch from '@/utils/customFetch';
+import TechDayEvent from '@/components/home/TechDayEvent';
+
+type OverviewPros = {
+  circulationStat: {
+    totalOverdue: number;
+    totalOverdueMoreThanAMonth: number;
+    totalPatronsCheckedOutHistory: number;
+  };
+  lastRegisteredMember: {
+    fullname: string;
+    barcode: string;
+  };
+  membersStat: {
+    numOfFemale: number;
+    numOfMale: number;
+    differenceBtwMaleAndFemale: number;
+    numOfStaff: number;
+    numOfTeacher: number;
+    numOfguest: number;
+  };
+};
 
 const HomeScreen: React.FC = () => {
-  const [message, setMessage] = useState("");
-  const [recipient, setRecipient] = useState("students");
+  const [message, setMessage] = useState('');
+  const [recipient, setRecipient] = useState('students');
 
   const [circulationStat, setCirculationStat] = useState({
     totalOverdue: 0,
@@ -17,8 +39,8 @@ const HomeScreen: React.FC = () => {
     totalPatronsCheckedOutHistory: 0,
   });
   const [lastRegisteredMember, setLastRegisteredMember] = useState({
-    fullname: "",
-    barcode: "",
+    fullname: '',
+    barcode: '',
   });
   const [membersStat, setMembersStat] = useState({
     numOfFemale: 0,
@@ -37,38 +59,26 @@ const HomeScreen: React.FC = () => {
     try {
       await getLibraryOverview(); // Fetch updated data
     } catch (error) {
-      console.error("Failed to refresh data:", error);
+      console.error('Failed to refresh data:', error);
     }
     setRefreshing(false);
   };
 
   const handleSendMessage = useCallback(() => {
-    alert("Message sent!");
+    alert('Message sent!');
   }, []);
 
   const getLibraryOverview = useCallback(async () => {
     try {
-      const response = await fetch(
-        "https://dzuelsfoundation.vercel.app/api/overview",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.errorMessage || "Failed to fetch data");
-
-      setCirculationStat(result.data.circulationStat);
-      setLastRegisteredMember(result.data.lastRegisteredMember);
-      setMembersStat(result.data.membersStat);
+      const res = await customFetch.get('/overview');
+      if (!res) return;
+      const { circulationStat, lastRegisteredMember, membersStat } =
+        res?.data as OverviewPros;
+      setCirculationStat(circulationStat);
+      setLastRegisteredMember(lastRegisteredMember);
+      setMembersStat(membersStat);
     } catch (error: any) {
-      console.log(error);
-      if (error.message === "jwt expired") logout();
+      if (error.message === 'jwt expired') logout();
     }
   }, [token, logout]);
 
@@ -81,13 +91,13 @@ const HomeScreen: React.FC = () => {
   const stats = useMemo(
     () => [
       {
-        label: "Total Borrowed",
-        value: circulationStat.totalPatronsCheckedOutHistory,
+        label: 'Total Borrowed',
+        value: circulationStat?.totalPatronsCheckedOutHistory,
       },
-      { label: "Total Overdues", value: circulationStat.totalOverdue },
+      { label: 'Total Overdues', value: circulationStat?.totalOverdue },
       {
-        label: "Overdue Over a Month",
-        value: circulationStat.totalOverdueMoreThanAMonth,
+        label: 'Overdue Over a Month',
+        value: circulationStat?.totalOverdueMoreThanAMonth,
       },
     ],
     [circulationStat]
@@ -96,7 +106,7 @@ const HomeScreen: React.FC = () => {
   return (
     <FlatList
       data={[{}]}
-      keyExtractor={() => "home"}
+      keyExtractor={() => 'home'}
       refreshing={refreshing}
       onRefresh={handleRefresh}
       renderItem={() => (
@@ -116,16 +126,19 @@ const HomeScreen: React.FC = () => {
 
           {/* Gender Stats Section */}
           <View style={styles.row}>
-            <StatItem label="Female" value={membersStat.numOfFemale} />
-            <StatItem label="Male" value={membersStat.numOfMale} />
+            <StatItem label="Female" value={membersStat?.numOfFemale} />
+            <StatItem label="Male" value={membersStat?.numOfMale} />
             <StatItem
               label="Difference"
-              value={membersStat.differenceBtwMaleAndFemale}
+              value={membersStat?.differenceBtwMaleAndFemale}
             />
           </View>
 
           {/* Last Registered */}
           <LastRegisteredMember {...lastRegisteredMember} />
+
+          {/* Tech day event */}
+          <TechDayEvent />
 
           {/* Bulk SMS Section */}
           <SmsSection

@@ -58,6 +58,13 @@ const overdueStyles = StyleSheet.create({
     marginBottom: 5,
     color: '#333',
   },
+  modalImage: {
+    width: '100%',
+    // height: 150,
+    aspectRatio: 16 / 9,
+    resizeMode: 'contain',
+    backgroundColor: 'black',
+  },
   bold: {
     fontWeight: 'bold',
   },

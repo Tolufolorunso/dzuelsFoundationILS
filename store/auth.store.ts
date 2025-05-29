@@ -1,5 +1,8 @@
+// @ts-nochec
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import customFetch from '@/utils/customFetch';
+import { router } from 'expo-router';
 
 interface User {
   id: string;
@@ -10,15 +13,19 @@ interface User {
   role: string;
 }
 
+interface LoginResponse {
+  token: string;
+  user: User;
+  message: string;
+  status: boolean;
+}
+
 interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
   isCheckingAuth: boolean;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<{ status: boolean; message: string }>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   updateUser: (
@@ -38,41 +45,35 @@ const useAuthStore = create<AuthState>((set) => ({
   login: async (username, password) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(
-        'https://dzuelsfoundation.vercel.app/api/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        }
-      );
+      const res = await customFetch.post<LoginResponse>('/auth/login', {
+        username,
+        password,
+      });
 
-      const data = await response.json();
+      const { token, user, status, message } = res.data;
 
-      if (!response.ok) {
-        throw new Error(data.errorMessage || 'Login failed');
-      }
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('user', JSON.stringify(data.user));
-      set({ user: data.user, token: data.token, isLoading: false });
-      return { status: true, message: data.message };
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      set({ user: user, token: token, isLoading: false });
+      router.replace('/(tabs)');
     } catch (error: any) {
       set({ isLoading: false });
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error.message || error || 'Login failed');
     } finally {
       set({ isCheckingAuth: false });
     }
   },
 
   logout: async () => {
+    console.log('Logging out...');
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('user');
     set({ user: null, token: null });
+    router.replace('/(auth)/login');
   },
 
   checkAuth: async () => {
+    console.log('Checking auth...');
     try {
       const token = await AsyncStorage.getItem('token');
       const userJson = await AsyncStorage.getItem('user');
@@ -80,7 +81,6 @@ const useAuthStore = create<AuthState>((set) => ({
 
       set({ user, token });
     } catch (error) {
-      console.log('Auth check failed', error);
       set({ user: null, token: null });
     } finally {
       set({ isCheckingAuth: false });

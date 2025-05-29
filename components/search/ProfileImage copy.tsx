@@ -40,13 +40,12 @@ export function ProfileImage({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.errorMessage || 'Failed to upload image');
+        throw new Error(errorData.message || 'Failed to upload image');
       }
 
       const data = await response.json();
       return data.imageUrl;
     } catch (error) {
-      console.error('Error uploading image:', error);
       Alert.alert(
         'Error',
         error instanceof Error ? error.message : 'Failed to upload image'
@@ -100,7 +99,6 @@ export function ProfileImage({
               Alert.alert('Success', 'Profile image updated successfully');
             }
           } catch (error) {
-            console.log(error);
             setImageUrl(imageUrl);
           }
         } else {
@@ -108,7 +106,6 @@ export function ProfileImage({
         }
       }
     } catch (error) {
-      console.error('Error selecting image:', error);
       Alert.alert('Error', 'Failed to select image');
     }
   };

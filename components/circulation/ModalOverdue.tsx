@@ -1,14 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from '@/styles/overdue.styles';
-import {
-  Image,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  ImageSourcePropType,
-} from 'react-native';
-import { HoldItem } from '@/app/(screens)/overdues';
+import { Image, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { HoldItemType } from '@/app/(screens)/overdues';
+import customFetch from '@/utils/customFetch';
 
 interface Student {
   patronName: string;
@@ -16,19 +10,28 @@ interface Student {
   // Add other student properties here if needed
 }
 
-interface ModalOverdueProps {
+type ModalOverdueProps = {
   selectedStudent: Student | null;
-  setSelectedStudent: (student: HoldItem | null) => void;
-  patronImage: { uri: string } | null;
-}
+  setSelectedStudent: (student: HoldItemType | null) => void;
+};
 
 const ModalOverdue: React.FC<ModalOverdueProps> = ({
   selectedStudent,
   setSelectedStudent,
-  patronImage,
 }) => {
-  if (!selectedStudent) return null;
+  const [patronImage, setPatronImage] = React.useState<string>('');
 
+  useEffect(() => {
+    const fetchPatronImage = async () => {
+      const res = await customFetch.get<any>(
+        `/patrons/image/${selectedStudent?.patronBarcode}`
+      );
+      const { imageData } = res.data;
+      setPatronImage(imageData.imgUrl);
+    };
+    fetchPatronImage();
+  }, [selectedStudent]);
+  if (!selectedStudent) return null;
   return (
     <Modal
       animationType="slide"
@@ -39,7 +42,20 @@ const ModalOverdue: React.FC<ModalOverdueProps> = ({
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalHeader}>Student Details</Text>
-          {/* <Image source={patronImage} style={styles.image} /> */}
+          {!patronImage ? (
+            <View
+              style={[
+                styles.modalImage,
+                { justifyContent: 'center', alignItems: 'center' },
+              ]}
+            >
+              <Text style={[styles.modalText, { color: '#fff' }]}>
+                {selectedStudent.patronName}
+              </Text>
+            </View>
+          ) : (
+            <Image source={{ uri: patronImage }} style={styles.modalImage} />
+          )}
           <Text style={styles.modalText}>
             <Text style={styles.bold}>Full Name:</Text>{' '}
             {selectedStudent.patronName}

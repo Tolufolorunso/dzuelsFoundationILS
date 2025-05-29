@@ -1,13 +1,20 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import Colors from '@/data/Colors';
 
-interface Option {
+import Colors from '@/data/Colors';
+import useCirculationStore from '@/store/circulation.store';
+import FullLoadingActivityIndicator from '@/components/shared/FullLoadingActivityIndicator';
+import Header from '@/components/header/Header';
+import AppText from '@/components/appText/AppText';
+
+import styles from '@/styles/circulation.styles';
+
+type Option = {
   title: string;
   route: string;
-}
+};
 
 const options: Option[] = [
   { title: 'Check In', route: '/(screens)/checkin' },
@@ -19,10 +26,21 @@ const options: Option[] = [
 
 export default function CirculationScreen(): JSX.Element {
   const router = useRouter();
+  const { holds, fetchHolds, isLoading } = useCirculationStore(
+    (state) => state
+  );
 
+  useEffect(() => {
+    if (holds.length > 0) return;
+    fetchHolds();
+  }, []);
+
+  if (isLoading) {
+    return <FullLoadingActivityIndicator />;
+  }
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Circulation</Text>
+      <Header style={styles.header} title="Circulation" />
       <View style={styles.grid}>
         {options.map((option, index) => (
           <TouchableOpacity
@@ -44,7 +62,7 @@ export default function CirculationScreen(): JSX.Element {
               colors={[Colors.PRIMARY, Colors.PRIMARY]}
               style={styles.button}
             >
-              <Text style={styles.buttonText}>{option.title}</Text>
+              <AppText title={option.title} style={styles.buttonText} />
             </LinearGradient>
           </TouchableOpacity>
         ))}
@@ -52,44 +70,3 @@ export default function CirculationScreen(): JSX.Element {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: Colors.PRIMARY,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 15,
-  },
-  buttonContainer: {
-    width: '46%', // Two buttons per row with some space in between
-  },
-  button: {
-    paddingVertical: 18,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5, // For Android shadow
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  buttonText: {
-    color: Colors.WHITE,
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.8,
-  },
-});

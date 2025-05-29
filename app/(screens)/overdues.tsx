@@ -1,65 +1,46 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
-  Modal,
-  StyleSheet,
-  ActivityIndicator,
   ListRenderItem,
 } from 'react-native';
-import Colors from '@/data/Colors';
-import { useHolds } from '@/hooks/useHolds';
-import { Image } from 'expo-image';
 
 import styles from '@/styles/overdue.styles';
 import ModalOverdue from '@/components/circulation/ModalOverdue';
+import FullLoadingActivityIndicator from '@/components/shared/FullLoadingActivityIndicator';
+import useCirculationStore from '@/store/circulation.store';
+import Header from '@/components/header/Header';
+import Colors from '@/data/Colors';
 
-export interface HoldItem {
+export type HoldItemType = {
   patronBarcode: string;
   patronName: string;
   title: string;
   borrowingDate: string | Date;
   dueDate: string | Date;
-  // Add other properties as needed
-}
+};
 
 export default function OverduesScreen() {
-  const { holds, loading } = useHolds();
-  const [selectedStudent, setSelectedStudent] = useState<HoldItem | null>(null);
-  const [patronImage, setPatronImage] = useState<{ uri: string } | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<HoldItemType | null>(
+    null
+  );
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color={Colors.PRIMARY} />
-      </View>
-    );
+  const { holds, fetchHolds, isLoading } = useCirculationStore(
+    (state) => state
+  );
+
+  useEffect(() => {
+    if (holds.length > 0) return;
+    fetchHolds();
+  }, []);
+
+  if (isLoading) {
+    return <FullLoadingActivityIndicator />;
   }
 
-  const fetchPatronImage = async () => {
-    if (!selectedStudent) return;
-
-    try {
-      const imageResponse = await fetch(
-        `https://dzuelsfoundation.vercel.app/api/patron/image/${selectedStudent.patronBarcode}`
-      );
-
-      if (imageResponse.ok) {
-        const imageData = await imageResponse.json();
-        setPatronImage(imageData);
-      }
-    } catch (error) {
-      console.error('Error fetching student image:', error);
-    }
-  };
-
-  // useEffect(() => {
-  //   fetchPatronImage();
-  // }, []);
-
-  const renderItem: ListRenderItem<HoldItem> = ({ item, index }) => (
+  const renderItem: ListRenderItem<HoldItemType> = ({ item, index }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => setSelectedStudent(item)}
@@ -85,8 +66,14 @@ export default function OverduesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Overdue Books</Text>
-      <Text style={styles.header}>Total: {getOverdueBooks(holds).length}</Text>
+      <View style={{ alignItems: 'center', paddingBottom: 20 }}>
+        <Header
+          style={{ color: Colors.PRIMARY, fontFamily: 'singleDay' }}
+          title="Overdue Books"
+        />
+        <Header type={3} title={`Total: ${getOverdueBooks(holds).length}`} />
+      </View>
+
       <FlatList
         data={getOverdueBooks(holds)}
         keyExtractor={(item, index) => `${item.patronBarcode}-${index}`}
@@ -98,7 +85,6 @@ export default function OverduesScreen() {
         <ModalOverdue
           selectedStudent={selectedStudent}
           setSelectedStudent={setSelectedStudent}
-          patronImage={patronImage}
         />
       )}
     </View>

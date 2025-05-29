@@ -26,17 +26,15 @@ export default function CheckinScreen() {
 
   const [scanningFor, setScanningFor] = useState<'item' | 'patron' | null>(
     null
-  ); // ✅ Added state to track which field is being scanned
+  );
 
-  const { loading, checkIn } = useCirculationStore((state) => state);
+  const { isLoading, checkIn } = useCirculationStore((state) => state);
 
   if (!permission) {
-    // Camera permissions are still loading.
     return <Text>Loading...</Text>;
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         <Text style={styles.message}>
@@ -69,7 +67,18 @@ export default function CheckinScreen() {
     }
 
     const res = await checkIn(patronBarcode, itemBarcode, Number(point));
-    console.log(res);
+    if (res) {
+      Alert.alert('Success', res.message, [
+        {
+          text: 'OK',
+          onPress: () => {
+            setPatronBarcode('');
+            setItemBarcode('');
+            setPoint('');
+          },
+        },
+      ]);
+    }
   };
 
   return (
@@ -105,7 +114,7 @@ export default function CheckinScreen() {
           />
         </View>
 
-        <Button text="Checkin" onPress={handleCheckin} loading={loading} />
+        <Button text="Checkin" onPress={handleCheckin} loading={isLoading} />
       </ScrollView>
       {/* Camera Modal */}
       {isCameraOpen && (

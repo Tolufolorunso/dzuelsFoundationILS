@@ -11,16 +11,17 @@ import { StyleSheet } from 'react-native';
 import { Camera } from 'expo-camera';
 import Button from '@/components/shared/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import customFetch from '@/utils/customFetch';
 
 interface BarcodeScannedEvent {
   data: string;
 }
 
 export default function AttendanceScreen() {
-  const [eventTitle, setEventTitle] = useState<string>('');
-  const [eventDate, setEventDate] = useState<Date | string>(''); // Can be a string or Date
-  const [eventPoints, setEventPoints] = useState<string>('');
-  const [barcode, setBarcode] = useState<string>('');
+  const [eventTitle, setEventTitle] = useState<string>('tech day');
+  const [eventDate, setEventDate] = useState<Date | string>('');
+  const [eventPoints, setEventPoints] = useState<string>('32');
+  const [barcode, setBarcode] = useState<string>('202302');
   const [scanning, setScanning] = useState<boolean>(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
@@ -42,7 +43,30 @@ export default function AttendanceScreen() {
     setScanning(false);
   };
 
-  const handleAttendance = (): void => {
+  const handleAttendance = async (): Promise<void> => {
+    try {
+      if (!eventTitle || !eventDate || !eventPoints || !barcode) {
+        Alert.alert('Incomplete', 'Please fill all fields');
+        return;
+      }
+
+      const res = await customFetch.post('/events/attendance');
+
+      console.log(res);
+      return;
+
+      // Call your API to mark attendance here
+      // await customFetch.post('/attendance', attendanceData);
+
+      // Reset fields after marking attendance
+      setEventTitle('');
+      setEventDate('');
+      setEventPoints('');
+      setBarcode('');
+    } catch (error) {
+      console.error('Error marking attendance:', error);
+      Alert.alert('Error', 'Failed to mark attendance. Please try again.');
+    }
     Alert.alert('Attendance Marked', `Student Barcode: ${barcode}`);
   };
 
